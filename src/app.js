@@ -1,5 +1,6 @@
 const express = require('express');
 const customerRoutes = require('./routes/customerRoutes');
+const noteRoutes = require('./routes/noteRoutes');
 const vehicleRoutes = require('./routes/vehicleRoutes');
 const requestLogger = require('./middleware/requestLogger');
 const errorHandler = require('./middleware/errorHandler');
@@ -18,6 +19,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/customers', customerRoutes);
+app.use('/notes', noteRoutes);
 app.use('/vehicles', vehicleRoutes);
 
 app.use((req, res, next) => {

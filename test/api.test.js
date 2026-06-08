@@ -94,6 +94,41 @@ describe('Express CRUD API', () => {
     assert.equal(updatedBody.data.model, '6');
   });
 
+  it('creates, updates and filters notes by customer', async () => {
+    const createResponse = await request('/notes', {
+      method: 'POST',
+      body: JSON.stringify({
+        customerId: 1,
+        content: 'Customer requested tire inspection.'
+      })
+    });
+    const createdBody = await createResponse.json();
+
+    assert.equal(createResponse.status, 201);
+    assert.equal(createdBody.data.customerId, 1);
+    assert.equal(createdBody.data.content, 'Customer requested tire inspection.');
+    assert.equal(Object.hasOwn(createdBody.data, 'createdAt'), false);
+    assert.equal(Object.hasOwn(createdBody.data, 'updatedAt'), false);
+
+    const updateResponse = await request(`/notes/${createdBody.data.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        customerId: 1,
+        content: 'Customer requested tire and brake inspection.'
+      })
+    });
+    const updatedBody = await updateResponse.json();
+
+    assert.equal(updateResponse.status, 200);
+    assert.equal(updatedBody.data.content, 'Customer requested tire and brake inspection.');
+
+    const filterResponse = await request('/notes/customer/1');
+    const filterBody = await filterResponse.json();
+
+    assert.equal(filterResponse.status, 200);
+    assert.equal(filterBody.data.some((note) => note.id === createdBody.data.id), true);
+  });
+
   it('returns 404 for missing resources', async () => {
     const response = await request('/customers/99999');
     const body = await response.json();
